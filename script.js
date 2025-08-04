@@ -65,6 +65,11 @@ function handleCellClick(cellElement) {
         col: parseInt(cellElement.dataset.col)
     };
     renderBoard(puzzleBoard);
+    
+    // Show keyboard on mobile after selection
+    if (window.innerWidth < 992) {
+        document.getElementById('number-pad').style.display = 'flex';
+    }
 }
 
 /**
@@ -348,6 +353,54 @@ function showConfetti() {
     }, 10000);
 }
 
+// --- Mobile Keyboard Functions ---
+
+function setupMobileKeyboard() {
+    const numberPad = document.getElementById('number-pad');
+    const keyboardToggle = document.getElementById('keyboard-toggle');
+    
+    // Add event listeners to number buttons
+    document.querySelectorAll('.num-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            if (!selectedCell || !gameActive) return;
+            
+            const value = parseInt(this.dataset.value);
+            const row = selectedCell.row;
+            const col = selectedCell.col;
+            
+            // Only allow changes to non-puzzle cells
+            if (initialPuzzle[row][col] !== 0) return;
+            
+            puzzleBoard[row][col] = value;
+            renderBoard(puzzleBoard);
+            checkWinCondition();
+        });
+    });
+    
+    // Add event listener to clear button
+    document.querySelector('.clear-btn').addEventListener('click', function() {
+        if (!selectedCell || !gameActive) return;
+        
+        const row = selectedCell.row;
+        const col = selectedCell.col;
+        
+        // Only allow changes to non-puzzle cells
+        if (initialPuzzle[row][col] !== 0) return;
+        
+        puzzleBoard[row][col] = 0;
+        renderBoard(puzzleBoard);
+    });
+    
+    // Toggle keyboard visibility
+    keyboardToggle.addEventListener('click', function() {
+        if (numberPad.style.display === 'flex') {
+            numberPad.style.display = 'none';
+        } else {
+            numberPad.style.display = 'flex';
+        }
+    });
+}
+
 // Set up event listeners
 document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('check-button').addEventListener('click', checkAnswers);
@@ -362,6 +415,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Set up theme switcher
     setupThemeSwitcher();
+    
+    // Set up mobile keyboard
+    setupMobileKeyboard();
     
     // Start the game
     initializeGame();

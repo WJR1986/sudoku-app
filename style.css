@@ -1,4 +1,4 @@
-/* Enhanced grid visibility */
+/* Enhanced grid visibility and mobile keyboard */
 :root {
     --primary-color: #3498db;
     --success-color: #2ecc71;
@@ -14,6 +14,9 @@
     --thick-grid-line: #555;
     --selected-bg: rgba(52, 152, 219, 0.3);
     --puzzle-cell-bg: #2a2a2a;
+    --keyboard-bg: #2a2a2a;
+    --keyboard-btn: #3a3a3a;
+    --keyboard-btn-hover: #4a4a4a;
 }
 
 [data-bs-theme="light"] {
@@ -31,6 +34,9 @@
     --thick-grid-line: #2c3e50;
     --selected-bg: rgba(52, 152, 219, 0.2);
     --puzzle-cell-bg: #f0f0f0;
+    --keyboard-bg: #f8f9fa;
+    --keyboard-btn: #e9ecef;
+    --keyboard-btn-hover: #dee2e6;
 }
 
 body {
@@ -38,7 +44,8 @@ body {
     background-color: var(--dark-bg);
     color: var(--dark-text);
     min-height: 100vh;
-    padding-top: 20px;
+    padding-top: 10px;
+    padding-bottom: 80px; /* Space for keyboard */
     transition: background-color 0.3s, color 0.3s;
 }
 
@@ -52,31 +59,7 @@ body {
     width: 100%;
     aspect-ratio: 1/1;
     position: relative;
-}
-
-/* Grid lines for better visibility */
-.sudoku-board::before,
-.sudoku-board::after {
-    content: '';
-    position: absolute;
-    background-color: var(--thick-grid-line);
-    z-index: 1;
-}
-
-.sudoku-board::before {
-    /* Vertical lines */
-    width: 3px;
-    height: 100%;
-    left: 33.33%;
-    transform: translateX(-1.5px);
-}
-
-.sudoku-board::after {
-    /* Horizontal lines */
-    height: 3px;
-    width: 100%;
-    top: 33.33%;
-    transform: translateY(-1.5px);
+    margin-bottom: 15px;
 }
 
 .cell {
@@ -115,21 +98,7 @@ body {
     z-index: 10;
 }
 
-/* Thicker borders for 3x3 boxes */
-.cell:nth-child(3n) {
-    border-right: 1px solid var(--grid-line);
-}
-
-.cell:nth-child(9n) {
-    border-right: 1px solid var(--grid-line);
-}
-
-.cell:nth-child(n+19):nth-child(-n+27),
-.cell:nth-child(n+46):nth-child(-n+54) {
-    border-bottom: 1px solid var(--grid-line);
-}
-
-/* Additional thick borders for 3x3 boxes */
+/* Thick borders for 3x3 boxes */
 .cell:nth-child(3n+3) {
     border-right: 2px solid var(--thick-grid-line);
 }
@@ -142,12 +111,10 @@ body {
     border-bottom: 2px solid var(--thick-grid-line);
 }
 
-/* Top border for the first row */
 .cell:nth-child(-n+9) {
     border-top: 2px solid var(--thick-grid-line);
 }
 
-/* Left border for the first column */
 .cell:nth-child(9n+1) {
     border-left: 2px solid var(--thick-grid-line);
 }
@@ -162,6 +129,54 @@ body {
     background-color: var(--dark-card);
     border: 1px solid var(--border-light);
     color: var(--dark-text);
+}
+
+/* Number Pad Styles */
+.number-pad {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background-color: var(--keyboard-bg);
+    border-radius: 10px;
+    padding: 15px;
+    margin-top: 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.number-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.num-btn {
+    flex: 1;
+    padding: 15px 0;
+    font-size: 1.5rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    background-color: var(--keyboard-btn);
+    color: var(--dark-text);
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.num-btn:hover {
+    background-color: var(--keyboard-btn-hover);
+    transform: translateY(-2px);
+}
+
+.num-btn:active {
+    transform: translateY(1px);
+}
+
+.clear-btn {
+    background-color: var(--danger-color);
+    color: white;
 }
 
 /* Responsive adjustments */
@@ -184,6 +199,11 @@ body {
         font-size: 0.85rem;
         padding: 5px 10px;
     }
+    
+    .num-btn {
+        padding: 12px 0;
+        font-size: 1.4rem;
+    }
 }
 
 @media (max-width: 400px) {
@@ -195,8 +215,25 @@ body {
         font-size: 0.9rem;
     }
     
-    .game-controls {
-        flex-direction: column;
-        align-items: center;
+    .num-btn {
+        padding: 10px 0;
+        font-size: 1.2rem;
+    }
+}
+
+/* Keyboard toggle button */
+#keyboard-toggle {
+    padding: 3px 8px;
+    font-size: 0.85rem;
+}
+
+/* Hide keyboard on desktop by default */
+@media (min-width: 992px) {
+    .number-pad {
+        display: none;
+    }
+    
+    #keyboard-toggle {
+        display: none;
     }
 }
