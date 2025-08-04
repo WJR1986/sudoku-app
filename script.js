@@ -1,4 +1,3 @@
-// script.js
 // Global variables
 let solvedBoard;
 let puzzleBoard;
@@ -15,7 +14,7 @@ const DIFFICULTY_LEVELS = {
 };
 
 /**
- * Renders the Sudoku board, applying styles for puzzle cells, user input, and errors.
+ * Renders the Sudoku board with enhanced grid visibility
  */
 function renderBoard(board) {
     const boardContainer = document.getElementById('sudoku-board');
@@ -69,7 +68,7 @@ function handleCellClick(cellElement) {
 }
 
 /**
- * Handles keyboard input to place numbers and checks for win condition.
+ * Handles keyboard input to place numbers
  */
 document.addEventListener('keydown', function(event) {
     if (!selectedCell || !gameActive) return; 
@@ -111,6 +110,7 @@ function checkWinCondition() {
     // If we get here, the board is perfect!
     gameActive = false;
     setStatusMessage("Congratulations! You solved the puzzle!", true);
+    showConfetti();
 }
 
 // --- Game Control Functions ---
@@ -157,8 +157,14 @@ function resetPuzzle() {
  */
 function newGame() {
     const difficulty = document.getElementById('difficulty').value;
+    startNewGame(difficulty);
+}
+
+/**
+ * Starts a new game with the specified difficulty
+ */
+function startNewGame(difficulty) {
     const holes = DIFFICULTY_LEVELS[difficulty];
-    
     initializeGame(holes);
     setStatusMessage(`New ${difficulty} game started!`, true);
 }
@@ -169,7 +175,7 @@ function newGame() {
 function setStatusMessage(message, isSuccess) {
     const statusElement = document.getElementById('status-message');
     statusElement.textContent = message;
-    statusElement.style.color = isSuccess ? '#27ae60' : '#e74c3c';
+    statusElement.style.color = isSuccess ? 'var(--success-color)' : 'var(--danger-color)';
 }
 
 // --- Generator and Solver Functions ---
@@ -278,10 +284,85 @@ function initializeGame(holes = 40) {
     renderBoard(puzzleBoard);
 }
 
-// Set up event listeners
-document.getElementById('check-button').addEventListener('click', checkAnswers);
-document.getElementById('reset-button').addEventListener('click', resetPuzzle);
-document.getElementById('new-game-button').addEventListener('click', newGame);
+// --- Theme Switching Functionality ---
 
-// Start the game
-initializeGame();
+function setupThemeSwitcher() {
+    const themeSwitch = document.getElementById('theme-switch');
+    const htmlElement = document.documentElement;
+    
+    // Set initial theme
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    htmlElement.setAttribute('data-bs-theme', savedTheme);
+    themeSwitch.checked = savedTheme === 'dark';
+    
+    // Add event listener
+    themeSwitch.addEventListener('change', function() {
+        const newTheme = this.checked ? 'dark' : 'light';
+        htmlElement.setAttribute('data-bs-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+    });
+}
+
+// --- Confetti Animation ---
+
+function showConfetti() {
+    const confettiContainer = document.createElement('div');
+    confettiContainer.style.position = 'fixed';
+    confettiContainer.style.top = '0';
+    confettiContainer.style.left = '0';
+    confettiContainer.style.width = '100%';
+    confettiContainer.style.height = '100%';
+    confettiContainer.style.pointerEvents = 'none';
+    confettiContainer.style.zIndex = '1000';
+    document.body.appendChild(confettiContainer);
+    
+    for (let i = 0; i < 150; i++) {
+        setTimeout(() => {
+            const confetti = document.createElement('div');
+            confetti.style.position = 'absolute';
+            confetti.style.width = '10px';
+            confetti.style.height = '10px';
+            confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+            confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+            confetti.style.left = `${Math.random() * 100}%`;
+            confetti.style.top = '-10px';
+            confetti.style.opacity = '0.8';
+            confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+            confettiContainer.appendChild(confetti);
+            
+            const animation = confetti.animate([
+                { top: '-10px', transform: `rotate(${Math.random() * 360}deg)` },
+                { top: `${100 + Math.random() * 20}%`, transform: `rotate(${Math.random() * 720}deg)` }
+            ], {
+                duration: 3000 + Math.random() * 3000,
+                easing: 'cubic-bezier(0.1, 0.8, 0.2, 1)'
+            });
+            
+            animation.onfinish = () => confetti.remove();
+        }, i * 20);
+    }
+    
+    // Remove container after animation
+    setTimeout(() => {
+        confettiContainer.remove();
+    }, 10000);
+}
+
+// Set up event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('check-button').addEventListener('click', checkAnswers);
+    document.getElementById('reset-button').addEventListener('click', resetPuzzle);
+    document.getElementById('new-game-button').addEventListener('click', newGame);
+    
+    // Add event listener for difficulty change
+    document.getElementById('difficulty').addEventListener('change', function() {
+        const difficulty = this.value;
+        startNewGame(difficulty);
+    });
+    
+    // Set up theme switcher
+    setupThemeSwitcher();
+    
+    // Start the game
+    initializeGame();
+});

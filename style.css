@@ -1,49 +1,107 @@
-/* style.css */
+/* Enhanced grid visibility */
 :root {
     --primary-color: #3498db;
     --success-color: #2ecc71;
     --danger-color: #e74c3c;
-    --dark-color: #2c3e50;
+    --dark-bg: #121212;
+    --dark-card: #1e1e1e;
+    --dark-text: #e0e0e0;
+    --light-gray: #2d2d2d;
+    --error-bg: #4a1f1c;
+    --border-dark: #555;
+    --border-light: #444;
+    --grid-line: #3a3a3a;
+    --thick-grid-line: #555;
+    --selected-bg: rgba(52, 152, 219, 0.3);
+    --puzzle-cell-bg: #2a2a2a;
+}
+
+[data-bs-theme="light"] {
+    --primary-color: #3498db;
+    --success-color: #2ecc71;
+    --danger-color: #e74c3c;
+    --dark-bg: #f8f9fa;
+    --dark-card: #ffffff;
+    --dark-text: #212529;
     --light-gray: #ecf0f1;
     --error-bg: #fadbd8;
+    --border-dark: #2c3e50;
+    --border-light: #bdc3c7;
+    --grid-line: #ddd;
+    --thick-grid-line: #2c3e50;
+    --selected-bg: rgba(52, 152, 219, 0.2);
+    --puzzle-cell-bg: #f0f0f0;
 }
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f8f9fa;
+    background-color: var(--dark-bg);
+    color: var(--dark-text);
     min-height: 100vh;
     padding-top: 20px;
+    transition: background-color 0.3s, color 0.3s;
 }
 
 .sudoku-board {
     display: grid;
     grid-template-columns: repeat(9, 1fr);
-    border: 3px solid var(--dark-color);
-    background-color: white;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border: 3px solid var(--thick-grid-line);
+    background-color: var(--dark-card);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     max-width: 500px;
     width: 100%;
-    aspect-ratio: 1/1; /* Maintain square aspect ratio */
+    aspect-ratio: 1/1;
+    position: relative;
+}
+
+/* Grid lines for better visibility */
+.sudoku-board::before,
+.sudoku-board::after {
+    content: '';
+    position: absolute;
+    background-color: var(--thick-grid-line);
+    z-index: 1;
+}
+
+.sudoku-board::before {
+    /* Vertical lines */
+    width: 3px;
+    height: 100%;
+    left: 33.33%;
+    transform: translateX(-1.5px);
+}
+
+.sudoku-board::after {
+    /* Horizontal lines */
+    height: 3px;
+    width: 100%;
+    top: 33.33%;
+    transform: translateY(-1.5px);
 }
 
 .cell {
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 1.25rem;
+    font-size: 1.4rem;
     font-weight: bold;
-    border: 1px solid #bdc3c7;
+    border: 1px solid var(--grid-line);
     cursor: pointer;
     transition: all 0.2s ease;
+    color: var(--dark-text);
+    position: relative;
+    z-index: 2;
 }
 
 .puzzle-cell {
-    background-color: var(--light-gray);
-    color: var(--dark-color);
+    background-color: var(--puzzle-cell-bg);
+    color: var(--dark-text);
+    font-weight: 600;
 }
 
 .user-cell {
     color: var(--primary-color);
+    font-weight: 500;
 }
 
 .incorrect {
@@ -52,22 +110,46 @@ body {
 }
 
 .selected {
-    background-color: #d6eaf8;
+    background-color: var(--selected-bg);
     box-shadow: inset 0 0 0 2px var(--primary-color);
+    z-index: 10;
 }
 
 /* Thicker borders for 3x3 boxes */
 .cell:nth-child(3n) {
-    border-right: 2px solid var(--dark-color);
+    border-right: 1px solid var(--grid-line);
 }
 
 .cell:nth-child(9n) {
-    border-right: 1px solid #bdc3c7;
+    border-right: 1px solid var(--grid-line);
 }
 
 .cell:nth-child(n+19):nth-child(-n+27),
 .cell:nth-child(n+46):nth-child(-n+54) {
-    border-bottom: 2px solid var(--dark-color);
+    border-bottom: 1px solid var(--grid-line);
+}
+
+/* Additional thick borders for 3x3 boxes */
+.cell:nth-child(3n+3) {
+    border-right: 2px solid var(--thick-grid-line);
+}
+
+.cell:nth-child(n+19):nth-child(-n+27) {
+    border-bottom: 2px solid var(--thick-grid-line);
+}
+
+.cell:nth-child(n+46):nth-child(-n+54) {
+    border-bottom: 2px solid var(--thick-grid-line);
+}
+
+/* Top border for the first row */
+.cell:nth-child(-n+9) {
+    border-top: 2px solid var(--thick-grid-line);
+}
+
+/* Left border for the first column */
+.cell:nth-child(9n+1) {
+    border-left: 2px solid var(--thick-grid-line);
 }
 
 #status-message {
@@ -76,20 +158,26 @@ body {
     transition: color 0.3s;
 }
 
-/* Responsive font sizes */
+.card {
+    background-color: var(--dark-card);
+    border: 1px solid var(--border-light);
+    color: var(--dark-text);
+}
+
+/* Responsive adjustments */
 @media (max-width: 768px) {
     .sudoku-board {
         max-width: 90vw;
     }
     
     .cell {
-        font-size: 1rem;
+        font-size: 1.2rem;
     }
 }
 
 @media (max-width: 576px) {
     .cell {
-        font-size: 0.9rem;
+        font-size: 1rem;
     }
     
     .btn {
@@ -100,10 +188,15 @@ body {
 
 @media (max-width: 400px) {
     .cell {
-        font-size: 0.8rem;
+        font-size: 0.9rem;
     }
     
     #status-message {
         font-size: 0.9rem;
+    }
+    
+    .game-controls {
+        flex-direction: column;
+        align-items: center;
     }
 }
