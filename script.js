@@ -37,10 +37,8 @@ function renderBoard(board) {
                 if (cellValue !== 0) {
                     cell.textContent = cellValue;
                     cell.classList.add('user-cell');
-                    // Check if the user's number is valid
-                    if (!isValidPlacement(board, cellValue, [i, j])) {
-                        cell.classList.add('incorrect');
-                    }
+                    
+                    // REMOVED REAL-TIME VALIDATION - Only validate when checking answers
                 }
                 cell.addEventListener('click', function() {
                     if (gameActive) handleCellClick(this);
@@ -126,11 +124,21 @@ function checkWinCondition() {
 function checkAnswers() {
     let hasErrors = false;
     
+    // First remove any existing incorrect classes
+    document.querySelectorAll('.incorrect').forEach(cell => {
+        cell.classList.remove('incorrect');
+    });
+    
     for (let i = 0; i < 9; i++) {
         for (let j = 0; j < 9; j++) {
             if (initialPuzzle[i][j] === 0 && puzzleBoard[i][j] !== 0) {
                 if (puzzleBoard[i][j] !== solvedBoard[i][j]) {
                     hasErrors = true;
+                    // Find the cell and mark it as incorrect
+                    const cell = document.querySelector(`.cell[data-row="${i}"][data-col="${j}"]`);
+                    if (cell) {
+                        cell.classList.add('incorrect');
+                    }
                 }
             }
         }
@@ -141,9 +149,6 @@ function checkAnswers() {
     } else {
         setStatusMessage("All your answers are correct so far! Keep going!", true);
     }
-    
-    // Re-render to show errors
-    renderBoard(puzzleBoard);
 }
 
 /**
